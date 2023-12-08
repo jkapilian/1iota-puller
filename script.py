@@ -1,7 +1,14 @@
 import urllib.request
 import json
+import csv
 
 def main():
+	try:
+		file = open("shows.json", "r")
+		arr = json.loads(file.read())
+		file.close()
+	except:
+		arr = []
 	with urllib.request.urlopen("https://prod-tickets.1iota.com/api/homepage") as response:
 		resp_json = json.loads(response.read())
 		for section in resp_json["pageSections"]:
@@ -16,8 +23,12 @@ def main():
 					show_json = json.loads(show_response.read())
 					for event in show_json[resp_key]:
 						if(event["isSoldOut"] == False):
-							print(f'{title} available on {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-
+							if event["eventId"] not in arr:
+								arr.append(event["eventId"])
+								print(f'{title} available on {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+		writeFile = open("shows.json", "w")
+		writeFile.write(json.dumps(arr))
+		writeFile.close()
 
 if __name__ == "__main__":
 	main()
