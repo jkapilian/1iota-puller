@@ -1,6 +1,7 @@
 import urllib.request
 import json
 import time
+from deepdiff import DeepDiff
 
 def main():
 	try:
@@ -30,11 +31,12 @@ def main():
 									cur_time: event
 								}
 								print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-							elif event != arr[eventId][max(arr[eventId].keys())]:
-								arr[eventId] = {
-									cur_time: event
-								}
-								print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+							else:
+								cur_event = arr[eventId][max(arr[eventId].keys())]
+								if event != cur_event:
+									arr[eventId][cur_time] = event
+									print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+									print(DeepDiff(cur_event, event))
 			except:
 				print(f'Issue with {api_route} {id}')
 				
