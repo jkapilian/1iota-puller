@@ -1,4 +1,4 @@
-import urllib.request
+import requests
 import json
 import time
 from deepdiff import DeepDiff
@@ -10,8 +10,8 @@ def main():
 		file.close()
 	except:
 		arr = {}
-	with urllib.request.urlopen("https://prod-tickets.1iota.com/api/homepage") as response:
-		resp_json = json.loads(response.read())
+	with requests.get("https://prod-tickets.1iota.com/api/homepage") as response:
+		resp_json = response.json()
 		cur_time = time.time()
 		for section in resp_json["pageSections"]:
 			try:
@@ -22,8 +22,8 @@ def main():
 					id = path_arr[2] if celeb else path_arr[1]
 					api_route = "celeb" if celeb else "project"
 					resp_key = "eventList" if celeb else "events"
-					with urllib.request.urlopen(f"https://prod-tickets.1iota.com/api/{api_route}/{id}") as show_response:
-						show_json = json.loads(show_response.read())
+					with requests.get(f"https://prod-tickets.1iota.com/api/{api_route}/{id}") as show_response:
+						show_json = show_response.json()
 						for event in show_json[resp_key]:
 							eventId = str(event["eventId"])
 							if eventId not in arr.keys():
