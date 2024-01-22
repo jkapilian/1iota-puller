@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import db
 from deepdiff import DeepDiff
 
 def main():
@@ -26,17 +27,18 @@ def main():
 						show_json = show_response.json()
 						for event in show_json[resp_key]:
 							eventId = str(event["eventId"])
-							if eventId not in arr.keys():
-								arr[eventId] = {
-									cur_time: event
-								}
-								print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-							else:
-								cur_event = arr[eventId][max(arr[eventId].keys())]
-								if event != cur_event:
-									arr[eventId][cur_time] = event
-									print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-									print(DeepDiff(cur_event, event))
+							db.checkEvent(eventId, event) #check if in db. if no, add. if yes, update if there are changes.
+							# if eventId not in arr.keys(): 
+							# 	arr[eventId] = {
+							# 		cur_time: event
+							# 	}
+							# 	print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+							# else:
+							# 	cur_event = arr[eventId][max(arr[eventId].keys())]
+							# 	if event != cur_event:
+							# 		arr[eventId][cur_time] = event
+							# 		print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+							# 		print(DeepDiff(cur_event, event))
 			except:
 				print(f'Issue with {api_route} {id}')
 				
@@ -45,4 +47,5 @@ def main():
 		writeFile.close()
 
 if __name__ == "__main__":
-	main()
+	db.checkEvent("19234", {})
+	#main()
