@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import db
+import sns
 from deepdiff import DeepDiff
 
 def main():
@@ -47,5 +48,6 @@ def main():
 		writeFile.close()
 
 if __name__ == "__main__":
-	db.checkEvent("19234", {})
+	# db.checkEvent("19234", {})
 	#main()
+	sns.publish("Test")
