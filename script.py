@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import db
+import sns
 from deepdiff import DeepDiff
 
 def main():
@@ -11,6 +12,8 @@ def main():
 		file.close()
 	except:
 		arr = {}
+	message_str = "New 1iota changes:\n\n"
+	changed = ""
 	with requests.get("https://prod-tickets.1iota.com/api/homepage") as response:
 		resp_json = response.json()
 		cur_time = time.time()
@@ -31,38 +34,24 @@ def main():
 							cur_event = db.checkEvent(eventId)
 
 							if (cur_event is None):
+								print("here")
 								db.putItem(eventId, event, cur_time)
+								changed += (f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
 							else:
 								if event != cur_event:
 									db.putItem(eventId, event, cur_time)
-									# arr[eventId][cur_time] = event
-									# print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-									# print(DeepDiff(cur_event, event))
+									changed += (f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}\n')
+									changed += (f'{DeepDiff(cur_event, event)}\n\n')
 								
-							#if event is not there, adds event
-							#if event is there but is the same as most recent time, does nothing
-							#if event is there but is different, adds a new field for cur_time in event
-
-							# if eventId not in arr.keys(): 
-							# 	arr[eventId] = {
-							# 		cur_time: event
-							# 	}
-							# 	print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-							# else:
-							# 	cur_event = arr[eventId][max(arr[eventId].keys())]
-							# 	if event != cur_event:
-							# 		arr[eventId][cur_time] = event
-							# 		print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-							# 		print(DeepDiff(cur_event, event))
-
 			except:
 				print(f'Issue with {api_route} {id}')
-				
+
+		if changed != "":
+			sns.publish(message_str + changed)
+
 		writeFile = open("shows.json", "w")
 		writeFile.write(json.dumps(arr))
 		writeFile.close()
 
 if __name__ == "__main__":
-	# print(db.checkEvent("82451"))
-	# db.putItem("",{})
 	main()
