@@ -27,7 +27,22 @@ def main():
 						show_json = show_response.json()
 						for event in show_json[resp_key]:
 							eventId = str(event["eventId"])
-							db.checkEvent(eventId, event) #check if in db. if no, add. if yes, update if there are changes.
+
+							item = db.checkEvent(eventId)
+
+							if (item):
+								#item.first
+								#if (compare fields) is different:
+									#db.updateItem(item, event)
+								pass
+							else:
+								db.putItem(eventId, event)
+
+							break
+							#if event is not there, adds event
+							#if event is there but is the same as most recent time, does nothing
+							#if event is there but is different, adds a new field for cur_time in event
+
 							# if eventId not in arr.keys(): 
 							# 	arr[eventId] = {
 							# 		cur_time: event
@@ -39,13 +54,17 @@ def main():
 							# 		arr[eventId][cur_time] = event
 							# 		print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
 							# 		print(DeepDiff(cur_event, event))
+
+					break
 			except:
 				print(f'Issue with {api_route} {id}')
+			break
 				
 		writeFile = open("shows.json", "w")
 		writeFile.write(json.dumps(arr))
 		writeFile.close()
 
 if __name__ == "__main__":
-	db.checkEvent("19234", {})
-	#main()
+	# print(db.checkEvent("81134"))
+	# db.putItem("",{})
+	main()
