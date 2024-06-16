@@ -1,17 +1,10 @@
 import requests
-import json
 import time
 import db
 import sns
 from deepdiff import DeepDiff
 
 def main():
-	try:
-		file = open("shows.json", "r")
-		arr = json.loads(file.read())
-		file.close()
-	except:
-		arr = {}
 	message_str = "New 1iota changes:\n\n"
 	changed = ""
 	with requests.get("https://prod-tickets.1iota.com/api/homepage") as response:
@@ -34,7 +27,6 @@ def main():
 							cur_event = db.checkEvent(eventId)
 
 							if (cur_event is None):
-								print("here")
 								db.putItem(eventId, event, cur_time)
 								changed += (f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
 							else:
@@ -48,10 +40,6 @@ def main():
 
 		if changed != "":
 			sns.publish(message_str + changed)
-
-		writeFile = open("shows.json", "w")
-		writeFile.write(json.dumps(arr))
-		writeFile.close()
 
 if __name__ == "__main__":
 	main()

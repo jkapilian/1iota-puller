@@ -9,17 +9,6 @@ import secrets
 dynamodb = boto3.resource('dynamodb', region_name='us-east-2', aws_access_key_id=secrets.ACCESS_KEY, aws_secret_access_key=secrets.SECRET_ACCESS_KEY)
 table = dynamodb.Table('Shows-1iota')
 
-"""
-eventId: {
-	time1: {
-		event details
-	}
-	time2: {
-		event details
-	}
-}
-"""
-
 def dynamo_to_python(dynamo_object: dict) -> dict:
     deserializer = TypeDeserializer()
     return {
@@ -49,11 +38,6 @@ def checkEvent(eventId):
 	except Exception as e:
 		print(e)
 		raise e
-
-
-
-	#if response, for each value in response, chec
-	#if not response['Item']
 
 def putItem(eventId, event, cur_time):
 	try:
