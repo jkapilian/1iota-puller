@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import db
 from deepdiff import DeepDiff
 
 def main():
@@ -26,17 +27,34 @@ def main():
 						show_json = show_response.json()
 						for event in show_json[resp_key]:
 							eventId = str(event["eventId"])
-							if eventId not in arr.keys():
-								arr[eventId] = {
-									cur_time: event
-								}
-								print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+
+							cur_event = db.checkEvent(eventId)
+
+							if (cur_event is None):
+								db.putItem(eventId, event, cur_time)
 							else:
-								cur_event = arr[eventId][max(arr[eventId].keys())]
 								if event != cur_event:
-									arr[eventId][cur_time] = event
-									print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
-									print(DeepDiff(cur_event, event))
+									db.putItem(eventId, event, cur_time)
+									# arr[eventId][cur_time] = event
+									# print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+									# print(DeepDiff(cur_event, event))
+								
+							#if event is not there, adds event
+							#if event is there but is the same as most recent time, does nothing
+							#if event is there but is different, adds a new field for cur_time in event
+
+							# if eventId not in arr.keys(): 
+							# 	arr[eventId] = {
+							# 		cur_time: event
+							# 	}
+							# 	print(f'New Show: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+							# else:
+							# 	cur_event = arr[eventId][max(arr[eventId].keys())]
+							# 	if event != cur_event:
+							# 		arr[eventId][cur_time] = event
+							# 		print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+							# 		print(DeepDiff(cur_event, event))
+
 			except:
 				print(f'Issue with {api_route} {id}')
 				
@@ -45,4 +63,6 @@ def main():
 		writeFile.close()
 
 if __name__ == "__main__":
+	# print(db.checkEvent("82451"))
+	# db.putItem("",{})
 	main()

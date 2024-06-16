@@ -1,2 +1,4 @@
 shows.json
 .venv
+secrets.py
+__pycache__
