@@ -30,13 +30,19 @@ def main():
 
 							item = db.checkEvent(eventId)
 
-							if (item):
-								#item.first
-								#if (compare fields) is different:
-									#db.updateItem(item, event)
-								pass
-							else:
+							if (item is None):
+								print("put")
 								db.putItem(eventId, event)
+							else:
+								print("update")
+								cur_event = db.dynamo_to_python(item["time"][max(item["time"].keys())])
+								if event != cur_event:
+									print("here")
+									db.updateItem()
+									# arr[eventId][cur_time] = event
+									# print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
+									# print(DeepDiff(cur_event, event))
+								
 
 							break
 							#if event is not there, adds event
@@ -65,6 +71,6 @@ def main():
 		writeFile.close()
 
 if __name__ == "__main__":
-	# print(db.checkEvent("81134"))
+	# print(db.checkEvent("82451"))
 	# db.putItem("",{})
 	main()

@@ -36,9 +36,10 @@ def python_to_dynamo(python_object: dict) -> dict:
 def checkEvent(eventId):
 
 	#check if eventId is in DB
-	response = table.get_item(Key={'EventId':eventId})
 	try:
-		return response["Item"]
+		response = table.get_item(Key={'EventId':eventId})
+		print("test")
+		return (response["Item"])
 	except:
 		return None
 
