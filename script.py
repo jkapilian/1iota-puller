@@ -28,17 +28,14 @@ def main():
 						for event in show_json[resp_key]:
 							eventId = str(event["eventId"])
 
-							item = db.checkEvent(eventId)
+							cur_event = db.checkEvent(eventId)
+							print(cur_event)
 
-							if (item is None):
-								print("put")
-								db.putItem(eventId, event)
+							if (cur_event is None):
+								db.putItem(eventId, event, cur_time)
 							else:
-								print("update")
-								cur_event = db.dynamo_to_python(item["time"][max(item["time"].keys())])
 								if event != cur_event:
-									print("here")
-									db.updateItem()
+									db.putItem(eventId, event, cur_time)
 									# arr[eventId][cur_time] = event
 									# print(f'Updated: {title} - {event["localStartDay"]} at {event["when"]} in {event["where"]}')
 									# print(DeepDiff(cur_event, event))

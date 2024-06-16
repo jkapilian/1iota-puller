@@ -2,6 +2,7 @@
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
 from boto3.dynamodb.types import TypeSerializer
+from boto3.dynamodb.conditions import Key
 import secrets
 
 
@@ -37,28 +38,31 @@ def checkEvent(eventId):
 
 	#check if eventId is in DB
 	try:
-		response = table.get_item(Key={'EventId':eventId})
-		print("test")
-		return (response["Item"])
-	except:
-		return None
+		response = table.query(
+			KeyConditionExpression=Key("EventId").eq(eventId),
+			ScanIndexForward=False,
+			Limit=1
+		)
+		if response["Count"] == 0:
+			return None
+		return dynamo_to_python(response["Items"][0]["Event"])
+	except Exception as e:
+		print(e)
+		raise e
 
 
 
 	#if response, for each value in response, chec
 	#if not response['Item']
 
-def putItem(eventId, event):
-
-	cur_time = "0"
-	table.put_item(
-		Item={
-			'EventId': eventId,
-			'time': {
-				cur_time: python_to_dynamo(event)
-			},
-		}
-	)
-
-def updateItem():
-	pass
+def putItem(eventId, event, cur_time):
+	try:
+		table.put_item(
+			Item={
+				'EventId': eventId,
+				'Timestamp': str(cur_time),
+				'Event': python_to_dynamo(event)
+			}
+		)
+	except Exception as e:
+		print(e)
